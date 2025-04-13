@@ -19,11 +19,12 @@ const handleInputChange = (e) => {
   setNewExpense({...newExpense, [name]: value })
 };
 const handleSubmit = (e) => {
-  e.prventDefault();
+  e.preventDefault();
   if (!newExpense.description || !newExpense.amount || !newExpense.date) return;
 
   const expense = {
-    id: expenses.length + 1,
+    id: Date.now(),
+    name: newExpense.name,
     description: newExpense.description,
     amount: parseFloat(newExpense.amount),
     date: newExpense.date,
@@ -33,20 +34,34 @@ const handleSubmit = (e) => {
   setNewExpense({ name: '', description: '', amount: '', date: '', category: '' });
 
 };
+const handleDelete = (id) => {
+  setExpenses(expenses.filter(expense => expense.id !== id));
+}
+const requestSort = (key) => {
+  let direction = 'asc';
+  if (sortConfig.key === key && sortConfig.direction === 'asc') {
+    direction = 'desc'
+  }
+  setSortConfig({ key, direction });
+}
 const sortedExpenses = [...expenses].sort((a, b) => {
   if (a[sortConfig.key] < b[sortConfig.key]) {
+    return sortConfig.direction === 'asc' ? -1 : 1;
+  }
+  if (a[sortConfig.key] > b[sortConfig.key]) {
     return sortConfig.direction === 'asc' ? -1 : 1;
   }
   return 0;
 });
 const filteredExpenses = sortedExpenses.filter(expense =>
   expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  expense.category.toLowerCase().includes(searchTerm.toLowerCase())
+  expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+   expense.name.toLowerCase().includes(searchTerm.toLowerCase())
 );
 return (
   <div className='app'>
     <header className='header'>
-      <h1>Expense Trainer</h1>
+      <h1>Expense Tracker</h1>
       <p>Start tracking your expenses today!</p>
     </header>
 
@@ -57,12 +72,12 @@ return (
 
         <form onSubmit={handleSubmit}>
           <div className='form-group'>
-            <label className='expense-name-label'>Chapo</label>
+            <label className='expense-name-label'>Name</label>
             <input 
             type="text" 
-            name="description"
-            placeholder='Enter expense description'
-            value={newExpense.description}
+            name="name"
+            placeholder='Enter expense name'
+            value={newExpense.name}
             onChange={handleInputChange}
             required
             />
@@ -86,6 +101,7 @@ return (
              value={newExpense.amount}
              onChange={handleInputChange}
              min="0"
+             step="0.1"
              required
              />
           </div>
@@ -123,7 +139,7 @@ return (
         <div className='search-box'>
           <input
            type="text"
-           placeholder='Search by category and description'
+           placeholder='Search by name, category and description'
            value={searchTerm}
            onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -132,6 +148,9 @@ return (
           <table>
             <thead>
               <tr>
+              <th onClick={() => requestSort('name')}>
+                    Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
               <th onClick={() => requestSort('description')}>
                     Description {sortConfig.key === 'description' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                   </th>
@@ -150,15 +169,23 @@ return (
               {filteredExpenses.length > 0 ? (
                 filteredExpenses.map(expense => (
                   <tr key={expense.id}>
+                    <td>{expense.name}</td>
                     <td>{expense.description}</td>
                     <td>{expense.category}</td>
                     <td>{expense.amount.toFixed(2)}</td>
                     <td>{new Date(expense.date).toLocaleDateString()}</td>
+                    <td>
+                      <button
+                      onClick={() => handleDelete(expense.id)}
+                      className='delete-btn'>
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className='no-results'>No expenses</td>
+                  <td colSpan="6" className='no-results'>No expenses</td>
                 </tr>
               )}
             </tbody>
