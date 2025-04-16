@@ -2,7 +2,43 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [expenses, setExpenses] = useState([]);
+  const [expenses, setExpenses] = useState([
+    {
+      name: 'Beef',
+      description: 'Friday Lunch',
+      category: 'Food',
+      amount: 15.99,
+      date: '2025-10-4'
+    },
+    {
+      name: 'School fees',
+      description: 'Extension',
+      category: 'Education',
+      amount: 20000,
+      date: '2024-12-9'
+    },
+    {
+      name: 'Braces installation',
+      description: 'Wednesday Morning',
+      category: 'Other',
+      amount: 120000,
+      date: '2025-1-2'
+    },
+    {
+      name: 'Electricity',
+      description: 'Due Date',
+      category: 'Utilities',
+      amount: 5000,
+      date: '2025-2-4'
+    },
+    {
+      name: 'Pay loans',
+      description: 'Overdue',
+      category: 'Finance',
+      amount: 30000,
+      date: '2025-3-9'
+    }
+  ]);
 
   const [newExpense, setNewExpense] = useState({
     name: '',
